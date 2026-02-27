@@ -1,9 +1,13 @@
 services:
   redis:
     image: redis:7-alpine
-    container_name: bobs-corn-redis
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
     restart: unless-stopped
 
   api:
@@ -12,8 +16,17 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - REDIS_URL=redis://bobs-corn-redis:6379/0
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_TIMEOUT_SECONDS=1
       - RATE_LIMIT_PER_MINUTE=1
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()\""]
+      interval: 10s
+      timeout: 3s
+      retries: 10
     restart: unless-stopped
 
   web:
@@ -24,5 +37,6 @@ services:
     ports:
       - "5173:5173"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     restart: unless-stopped
