@@ -1,4 +1,5 @@
 # Bobs Corn API (FastAPI)
+![](docs/images/1.png)  
 
 ## Run (dev)
 ```bash
