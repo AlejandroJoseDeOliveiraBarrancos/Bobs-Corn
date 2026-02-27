@@ -22,6 +22,7 @@ def per_client_rate_limiter(
         if not allowed:
             return JSONResponse(
                 status_code=429,
+                headers={"Retry-After": "60"},
                 content={"detail": "Too many requests. Please try again later."},
             )
 

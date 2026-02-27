@@ -1,4 +1,4 @@
-I started this task at 18:00 BOL UTC-4 2/26/2026, I'm going to treat this task as in a accelerated sprint or iteration, with some coffee and good music.
+I started this task at [18:00] BOL UTC-4 2/26/2026, I'm going to treat this task as in a accelerated sprint or iteration, with some coffee and good music.
 
 When I face a task that comes in a ticket like this, first I read carefully, take notes if needed. 
 Notes I took at first read:
@@ -11,7 +11,6 @@ POST requests:
 2) Non functional reqs:
 UI for clients to make corns petitions
 sell at most 1 corn per client (this is the rate limit)
-
 
 To ensure clients get a better experience, we can add:
 - Queues
@@ -29,7 +28,6 @@ and structured logging
 Although this can be overengineering for a simple app, would definitely be a solid foundation for future changes and extension. 
 
 [18:25] Note: for defining the observability stack I did some research online. Also, at this stage I would share my plan with the team if needed or mention it in a meeting as well. Document the requirements and the decision records as well. Of course, everything depending on the team's conventions and needs, in startups this can vary so much. So, my plan is:
-
 
 1) Select tech stack, document and communicate
 2) create GitHub repo and meet core reqs:
@@ -81,7 +79,15 @@ Elasticity:
 
 I'll start with Elasticity, Reliability and finally Observability. Why? In value to business order (of course, again, I will communicate with the team to know if this is the right path, validate the strategy and milestones and then go ahead)
 
-[20:xx] 
-Used AI to speed up Docker ignoore, Docker images and docker compse files creation.
-Researched the web for redis rate limitting approaches, I'm going to follow this one https://snir-orlanczyk.medium.com/fastapi-rate-limit-middleware-ec9e46f84cdb
+[21:07] Just pushed the Elasticity code to feature/Elasticity and created aand merged pull request here https://github.com/AlejandroJoseDeOliveiraBarrancos/Bobs-Corn/pull/1
+- Used AI to speed up Docker ignoore, Docker images and docker compse files creation.
+- Researched the web for redis rate limitting approaches, followed this one https://snir-orlanczyk.medium.com/fastapi-rate-limit-middleware-ec9e46f84cdb
+
+For the Reliability features, I did and assessment and I will only add:
+- Health checks
+- Redis timeout = 1s
+- Fail-open on Redis failure
+- Client respects Retry-After (backoff)
+
+Nothing too rebust because we don't have heavy or long running operations yet, so this can wait for further versions. Let's go.
 
