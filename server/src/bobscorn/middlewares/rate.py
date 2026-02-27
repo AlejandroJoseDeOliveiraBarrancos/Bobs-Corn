@@ -1,33 +1,29 @@
-import asyncio
-import time
 from fastapi import Request
 from fastapi.responses import JSONResponse
+from bobscorn.middlewares.limits_wrapper import hit
 
-_lock = asyncio.Lock()
-_last_request_time: dict[str, float] = {}
+def per_client_rate_limiter(
+    rate_per_minute: int,
+    exclude_paths: set[str] | None = None,
+):
+    exclude_paths = exclude_paths or set()
 
-def per_client_rate_limiter(window_seconds: float = 1.0, exclude_paths: list[str] = []):
     async def middleware(request: Request, call_next):
-
         if request.method.upper() == "OPTIONS":
             return await call_next(request)
 
-        if request.url.path in [path.lower() for path in exclude_paths]:
+        if request.url.path in exclude_paths:
             return await call_next(request)
 
         client_ip = request.client.host if request.client else "unknown"
-        now = time.monotonic()
 
-        async with _lock:
-            last_time = _last_request_time.get(client_ip)
+        allowed = hit(key=client_ip, rate_per_minute=rate_per_minute)
 
-            if last_time and (now - last_time) < window_seconds:
-                return JSONResponse(
-                    status_code=429,
-                    content={"detail": "Too Many Requests"},
-                )
-
-            _last_request_time[client_ip] = now
+        if not allowed:
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Too many requests. Please try again later."},
+            )
 
         return await call_next(request)
 
